@@ -1,7 +1,7 @@
 # Interpretador Shell
 
 ## Objetivo
-**Implementar um interpretador de comandos em terminal para Linux.
+Implementar um interpretador de comandos em terminal para Linux.
 
 ## Requisitos 
 
