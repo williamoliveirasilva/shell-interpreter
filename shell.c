@@ -141,31 +141,48 @@ int executar_cmd_pipe(char **argv, int i){
 
 int main(int argc, char **argv){
 
-    if(argc == 1){
-        printf("Nao foram inseridos comandos\n");
-        return 0;
-    }
+    while(1)
+    {
+        char comando[1024];
+        printf("$ ");
+        fgets(comando, sizeof(comando), stdin);
 
-    char **comando = &argv[1];
+        comando[strcspn(comando, "\n")] = '\0';
 
-    int position = posicao_cmd_cond(comando);
+        char *token = strtok(comando, " ");
+        char *args[64];
+        int i = 0;
 
-    if(position > 0){
-        executar_cmd_cond(comando, position);
-    } else {
-        int pipes = conta_char(comando, PIPE);
-        if(pipes > 0){
-            executar_cmd_pipe(comando, pipes);
+        while(token != NULL) {
+            args[i++] = token;
+            token = strtok(NULL, " ");
+        }
+        args[i] = NULL;
+
+        if(i == 0) {
+            printf("Não foram inseridos nenhum comando\n");
+            continue;
+        }
+
+        int position = posicao_cmd_cond(args);
+
+        if(position > 0){
+            executar_cmd_cond(args, position);
         } else {
-            int n = conta_char(comando, ECOMERCIAL);
-            if(n > 0){
-                background_flag = BACKGROUND;
-                position = posicao_char(comando, ECOMERCIAL, 0);
-                comando[position] = NULL;
-            } 
-            executar_cmd(comando);
-            }        
-
+            int pipes = conta_char(args, PIPE);
+            if(pipes > 0){
+                executar_cmd_pipe(args, pipes);
+            } else {
+                int n = conta_char(args, ECOMERCIAL);
+                if(n > 0){
+                    background_flag = BACKGROUND;
+                    position = posicao_char(args, ECOMERCIAL, 0);
+                    args[position] = NULL;
+                }
+                executar_cmd(args);
+            }
+        }
     }
+
     return 0;
 }
