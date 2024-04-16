@@ -12,6 +12,8 @@
 #define BACKGROUND 1
 
 #define MAX_ARGUMENT_SIZE 50
+#define MAX_COMMAND_SIZE 1024
+#define MAX_ARGV_SIZE 128
 
 int background_flag = 0;
 int initial_condition = 0;
@@ -48,6 +50,7 @@ int posicao_cmd_cond(char **argv){
         if((argv[i][0] == ECOMERCIAL) && (argv[i][1] == ECOMERCIAL) || (argv[i][0] == PIPE && argv[i][1] == PIPE))
             return i;
         i++;
+        printf("%d", i);
     }
     return -1;
 }
@@ -139,47 +142,47 @@ int executar_cmd_pipe(char **argv, int i){
     return 0;
 }
 
-int main(int argc, char **argv){
+int main(){
 
     while(1)
     {
-        char comando[1024];
+        char comando[MAX_COMMAND_SIZE];
         printf("$ ");
         fgets(comando, sizeof(comando), stdin);
 
         comando[strcspn(comando, "\n")] = '\0';
 
         char *token = strtok(comando, " ");
-        char *args[64];
-        int i = 0;
+        char *argv[MAX_ARGV_SIZE];
+        int argc = 0;
 
         while(token != NULL) {
-            args[i++] = token;
+            argv[argc++] = token;
             token = strtok(NULL, " ");
         }
-        args[i] = NULL;
+        argv[argc] = NULL;
 
-        if(i == 0) {
+        if(argc == 0) {
             printf("Não foram inseridos nenhum comando\n");
             continue;
         }
 
-        int position = posicao_cmd_cond(args);
+        int position = posicao_cmd_cond(argv);
 
         if(position > 0){
-            executar_cmd_cond(args, position);
+            executar_cmd_cond(argv, position);
         } else {
-            int pipes = conta_char(args, PIPE);
+            int pipes = conta_char(argv, PIPE);
             if(pipes > 0){
-                executar_cmd_pipe(args, pipes);
+                executar_cmd_pipe(argv, pipes);
             } else {
-                int n = conta_char(args, ECOMERCIAL);
+                int n = conta_char(argv, ECOMERCIAL);
                 if(n > 0){
                     background_flag = BACKGROUND;
-                    position = posicao_char(args, ECOMERCIAL, 0);
-                    args[position] = NULL;
+                    position = posicao_char(argv, ECOMERCIAL, 0);
+                    argv[position] = NULL;
                 }
-                executar_cmd(args);
+                executar_cmd(argv);
             }
         }
     }
