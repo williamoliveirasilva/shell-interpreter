@@ -50,7 +50,6 @@ int posicao_cmd_cond(char **argv){
         if((argv[i][0] == ECOMERCIAL) && (argv[i][1] == ECOMERCIAL) || (argv[i][0] == PIPE && argv[i][1] == PIPE))
             return i;
         i++;
-        printf("%d", i);
     }
     return -1;
 }
